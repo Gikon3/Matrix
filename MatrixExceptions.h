@@ -16,4 +16,10 @@ namespace MatrixException {
     public:
         SizeMismatch() : Exception("Size mismatch") {}
     };
+
+    class NotSquare : public Exception
+    {
+    public:
+        NotSquare() : Exception("Not is square") {}
+    };
 }

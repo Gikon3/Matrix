@@ -137,6 +137,43 @@ public:
         m.transpose();
         return m;
     }
+    T det() const {
+        if (rows_.size() == 0 || rows_.size() != rows_[0].size())
+            throw MatrixException::NotSquare{};
+        return detImpl(*this);
+    }
+
+private:
+    Matrix<T> subMatrix(int n, const Matrix<T>& m) const {
+        Matrix<T> retval{m.nrows() - 1, m.ncols() - 1};
+        for (int i = 1; i < m.nrows(); ++i) {
+            bool fl = false;
+            for (int j = 0; j < m.ncols(); ++j) {
+                if (j == n)
+                    fl = true;
+                else
+                    retval[i - 1][!fl ? j : j - 1] = m[i][j];
+            }
+        }
+        return retval;
+    }
+
+    T detImpl(const Matrix& m) const {
+        if (m.nrows() == 1)
+            return m[0][0];
+
+        if (m.nrows() == 2)
+            return m[0][0] * m[1][1] - m[1][0] * m[0][1];
+
+        T accum{};
+        bool sign = true;
+        for (int i = 0; i < m.nrows(); ++i) {
+            const T value = m[0][i] * detImpl(subMatrix(i, m));
+            accum = sign ? accum + value : accum - value;
+            sign = !sign;
+        }
+        return accum;
+    }
 
 private:
     std::vector<Row> rows_;
